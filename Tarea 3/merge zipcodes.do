@@ -4,47 +4,36 @@ global INPUT "/Users/malenahedemann/Desktop/Clases herramientas/Clase 3/Tarea"
 edit
 * Paste ZIP from https://www.zipcodestogo.com/Maryland/
 drop zipcodemap
-*Enumerar cuantas veces aparece el mismo nombre de la ciudad
-bys city county: gen n=_n
+bys city (county): gen n=_n
 keep if n==1
 drop n
-*Achicamos la base lo mas posible
 compress
 save "$INPUT/MD_zipcodes.dta", replace
 
 ** Datos crimen que bajamos de socrata
-import delimited "$INPUT/crime.csv",clear
+import delimited "$INPUT/crime.csv", clear
 keep if year==2015
 drop id crime_rate
-*Separamos name entre nombre de la ciudad y el estado
 split name, p(,)
-*nos quedamos con el estado de meryland
-*lo convertimos en numero 
 encode name2, gen(state_n)
-*me quedo solo con los que tienen un 2
 keep if state_n==2
-drop name2
 drop state_n
 compress
 save "$INPUT/MD_crime.dta", replace
-ren name1 city
-
-**Vuelvo a abrir la base de datos de zipcodes pq sino no puedo hacer merge
-*pq no tengo county en la base de crimen 
-use "$INPUT/MD_zipcodes.dta", clear
-bys city: gen n=_n
-keep if n==1
-drop n
-compress
-save "$INPUT/MD_zipcodes.dta", replace
 
 ** Merge
 use "$INPUT/MD_crime.dta", clear
 ren name1 city
 merge m:1 city using "$INPUT/MD_zipcodes.dta"
 keep if _m==3
+save "$INPUT/MD_merge.dta", replace
 
-*en python en inicial donde dice california poner los zipcodes separados por comillas
+** Quiero ver los diferentes zipcodes
+*bys zipcode: gen n=_n
+*keep if n==1
+*br zipcode 
+
+use "$INPUT/MD_merge.dta", clear
 
 ** Bajar shapefile y buscar este ID
 gen ID=.
@@ -73,34 +62,29 @@ replace ID=21	 if county=="Washington"
 replace ID=22	 if county=="Wicomico"
 replace ID=23	 if county=="Worcester"
 
+drop _m
 
-drop _m 
-*Achico el incident name 
 gen incident=subinstr(incident_parent_type, " ", "",.)
 drop incident_parent_type
-*Por county por año por mes e incidente me genera la cantidad de crimenes, los suma
 bys county year month incident: egen n_crime=sum(crime_count)
-drop if county==""
-sort county year month incident 
-*No necesito city porque esta todo a nivel de county:
+*sort county year month incident
 drop name city
-*elegimos la mediana por county:
-bys county: egen zip_m=median(zipc)
+bys county: egen zip_m=min(zipc)
 bys county year month incident: gen n=_n
 keep if n==1
 
 drop n 
 replace incident="BreakingnEntering" if incident=="Breaking&Entering"
 * Para obtener zipcodes para bajar datos weather
-levelsof zip_m
 save "$INPUT/MD_crime_2015.dta", replace
+levelsof zip_m
+bys zip_m: gen n=_n
+keep if n==1
+br zip_m 
 
-
-*Creamos una base de datos de los criemenes
 use "$INPUT/MD_crime_2015.dta", clear
 local crimes "Assault BreakingnEntering Robbery Theft"
-*fuardo temporal, por esto tengo qeu correr todo seguido
-*me quedo con todas las obs que dicen assault y despues junta las bases de datos
+
 local y 0
 foreach c of local crimes {
 	local y=`y'+1
@@ -118,7 +102,6 @@ forv z=1/4 {
 	merge 1:1 county year month using `f`z'', nogen
 }
 drop incident
-*Donde hay puntos le pongo cero
 recode Assault BreakingnEntering Robbery Theft (.=0)
 save "$INPUT/MD_crime_2015_wide.dta", replace
 
@@ -150,3 +133,5 @@ keep if _m==3
 drop _m
 
 save "$INPUT/MD_final.dta", replace
+export delimited using "$INPUT/MD_final.csv", replace
+
