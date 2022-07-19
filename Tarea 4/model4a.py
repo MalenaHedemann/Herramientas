@@ -1,9 +1,3 @@
-"""
-Model exported as python.
-Name : model4a
-Group : 
-With QGIS : 32208
-"""
 
 from qgis.core import QgsProcessing
 from qgis.core import QgsProcessingAlgorithm
@@ -11,7 +5,20 @@ from qgis.core import QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFeatureSink
 import processing
 
-
+mainpath = "/Users/malenahedemann/Desktop/Clases herramientas/Clase 4"
+clean = "{}/Clean/clean.shp".format(mainpath)
+admin = "{}/ne_10m_admin_0_countries/ ne_10m_admin_0_countries.shp".format(mainpath)
+outpath = "{}/_output/counties_agrisuit.csv".format(mainpath)
+junkpath = "{}/_output/junk".format(mainpath)
+junkfile = "{}/_output/junk/agrisuit.tif".format(mainpath)
+if not os.path.exists(mainpath + "/_output"):
+    os.mkdir(mainpath + "/_output")
+if not os.path.exists(junkpath):
+    os.mkdir(junkpath)
+    
+###################################################################
+    #we create the model
+    
 class Model4a(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
@@ -25,32 +32,27 @@ class Model4a(QgsProcessingAlgorithm):
         feedback = QgsProcessingMultiStepFeedback(4, model_feedback)
         results = {}
         outputs = {}
-
+###################################################################
         # Fix geometries - wlds
+###################################################################
         alg_params = {
-            'INPUT': '/Users/malenahedemann/Desktop/Clases herramientas/Clase 4/Clean/clean.shp',
+            'INPUT': 'clean',
             'OUTPUT': parameters['Fixgeo_wlds']
         }
-        outputs['FixGeometriesWlds'] = processing.run('native:fixgeometries', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['Fixgeo_wlds'] = outputs['FixGeometriesWlds']['OUTPUT']
+        Fixgeo_wlds = processing.run('native:fixgeometries', alg_params, context=context, feedback=feedback, is_child_algorithm=True)['OUTPUT']
 
-        feedback.setCurrentStep(1)
-        if feedback.isCanceled():
-            return {}
-
+###################################################################
         # Fix geometries - countries
+###################################################################
         alg_params = {
-            'INPUT': '/Users/malenahedemann/Desktop/Clases herramientas/Clase 4/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp',
+            'INPUT': 'admin',
             'OUTPUT': parameters['Fixge_countries']
         }
-        outputs['FixGeometriesCountries'] = processing.run('native:fixgeometries', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['Fixge_countries'] = outputs['FixGeometriesCountries']['OUTPUT']
+        Fixge_countries = processing.run('native:fixgeometries', alg_params, context=context, feedback=feedback, is_child_algorithm=True)['OUTPUT']
 
-        feedback.setCurrentStep(2)
-        if feedback.isCanceled():
-            return {}
-
+###################################################################
         # Statistics by categories
+###################################################################
         alg_params = {
             'CATEGORIES_FIELD_NAME': ['ADMIN'],
             'INPUT': 'Intersection_3a806d6c_3247_4802_b4a9_d816c7b2f5bd',
@@ -63,8 +65,9 @@ class Model4a(QgsProcessingAlgorithm):
         feedback.setCurrentStep(3)
         if feedback.isCanceled():
             return {}
-
+###################################################################
         # Intersection
+###################################################################
         alg_params = {
             'INPUT': outputs['FixGeometriesWlds']['OUTPUT'],
             'INPUT_FIELDS': ['GID'],
@@ -73,8 +76,7 @@ class Model4a(QgsProcessingAlgorithm):
             'OVERLAY_FIELDS_PREFIX': '',
             'OUTPUT': parameters['Intersection']
         }
-        outputs['Intersection'] = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['Intersection'] = outputs['Intersection']['OUTPUT']
+        Intersection = processing.run('native:intersection', alg_params, context=context, feedback=feedback, is_child_algorithm=True)['OUTPUT']
         return results
 
     def name(self):

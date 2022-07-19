@@ -1,9 +1,4 @@
-"""
-Model exported as python.
-Name : model1
-Group : 
-With QGIS : 32208
-"""
+    #Setup preamble
 
 from qgis.core import QgsProcessing
 from qgis.core import QgsProcessingAlgorithm
@@ -14,6 +9,21 @@ from qgis.core import QgsCoordinateReferenceSystem
 import processing
 
 
+
+mainpath = "/Users/malenahedemann/Desktop/Clases herramientas/Clase 4"
+suit = "{}/SUIT/suit/hdr.adf".format(mainpath)
+gadm = "{}/gadm41_USA_shp/gadm41_USA_2.shp".format(mainpath)
+outpath = "{}/_output/counties_agrisuit.csv".format(mainpath)
+junkpath = "{}/_output/junk".format(mainpath)
+junkfile = "{}/_output/junk/agrisuit.tif".format(mainpath)
+if not os.path.exists(mainpath + "/_output"):
+    os.mkdir(mainpath + "/_output")
+if not os.path.exists(junkpath):
+    os.mkdir(junkpath)
+    
+    
+###################################################################
+    #we create the model
 class Model1(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
@@ -27,11 +37,17 @@ class Model1(QgsProcessingAlgorithm):
         feedback = QgsProcessingMultiStepFeedback(4, model_feedback)
         results = {}
         outputs = {}
-
+###################################################################
         # Drop field(s)
+###################################################################
+#We eliminate certain variables that won't be used
         alg_params = {
-            'COLUMN': ['GID_0','NAME_0','GID_1','GID_2','HASC_2','CC_2','TYPE_2','NL_NAME 2','VARNAME_2','NL_NAME_1','NL_NAME_2',' ENGTYPE_2'],
-            'INPUT': '/Users/malenahedemann/Desktop/Clases herramientas/Clase 4/gadm41_USA_shp/gadm41_USA_2.shp',
+                    'COLUMN':
+            ['GID_0','NAME_0','GID_1',
+             'GID_2','HASC_2','CC_2',
+             'TYPE_2','NL_NAME 2','VARNAME_2',
+             'NL_NAME_1','NL_NAME_2',' ENGTYPE_2'],
+            'INPUT': 'gadm',
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
         outputs['DropFields'] = processing.run('native:deletecolumn', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
@@ -39,12 +55,13 @@ class Model1(QgsProcessingAlgorithm):
         feedback.setCurrentStep(1)
         if feedback.isCanceled():
             return {}
-
+###################################################################
         # Warp (reproject)
+###################################################################
         alg_params = {
             'DATA_TYPE': 0,  # Use Input Layer Data Type
             'EXTRA': '',
-            'INPUT': '/Users/malenahedemann/Desktop/Clases herramientas/Clase 4/SUIT/suit/hdr.adf',
+            'INPUT': 'suit',
             'MULTITHREADING': False,
             'NODATA': None,
             'OPTIONS': '',
@@ -56,14 +73,11 @@ class Model1(QgsProcessingAlgorithm):
             'TARGET_RESOLUTION': None,
             'OUTPUT': parameters['Agrisuit']
         }
-        outputs['WarpReproject'] = processing.run('gdal:warpreproject', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['Agrisuit'] = outputs['WarpReproject']['OUTPUT']
+        Agrisuit = processing.run('gdal:warpreproject', alg_params, context=context, feedback=feedback, is_child_algorithm=True)['OUTPUT']
 
-        feedback.setCurrentStep(2)
-        if feedback.isCanceled():
-            return {}
-
+###################################################################
         # Add autoincremental field
+###################################################################
         alg_params = {
             'FIELD_NAME': 'cid',
             'GROUP_FIELDS': [''],
@@ -75,14 +89,11 @@ class Model1(QgsProcessingAlgorithm):
             'START': 1,
             'OUTPUT': parameters['Counties']
         }
-        outputs['AddAutoincrementalField'] = processing.run('native:addautoincrementalfield', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['Counties'] = outputs['AddAutoincrementalField']['OUTPUT']
+        cpunties = processing.run('native:addautoincrementalfield', alg_params, context=context, feedback=feedback, is_child_algorithm=True)['OUTPUT']
 
-        feedback.setCurrentStep(3)
-        if feedback.isCanceled():
-            return {}
-
+###################################################################
         # Zonal statistics
+###################################################################
         alg_params = {
             'COLUMN_PREFIX': '_',
             'INPUT': outputs['AddAutoincrementalField']['OUTPUT'],
@@ -91,9 +102,8 @@ class Model1(QgsProcessingAlgorithm):
             'STATISTICS': [2],  # Mean
             'OUTPUT': parameters['Zonal']
         }
-        outputs['ZonalStatistics'] = processing.run('native:zonalstatisticsfb', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['Zonal'] = outputs['ZonalStatistics']['OUTPUT']
-        return results
+      processing.run('native:zonalstatisticsfb', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
 
     def name(self):
         return 'model1'

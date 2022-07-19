@@ -1,9 +1,4 @@
-"""
-Model exported as python.
-Name : model2
-Group : 
-With QGIS : 32208
-"""
+
 
 from qgis.core import QgsProcessing
 from qgis.core import QgsProcessingAlgorithm
@@ -12,6 +7,11 @@ from qgis.core import QgsProcessingParameterRasterDestination
 from qgis.core import QgsCoordinateReferenceSystem
 import processing
 
+mainpath = "/Users/malenahedemann/Desktop/Clases herramientas/Clase 4"
+suit = "{}/SUIT/suit/hdr.adf".format(mainpath)
+    
+###################################################################
+    #we create the model
 
 class Model2(QgsProcessingAlgorithm):
 
@@ -24,12 +24,13 @@ class Model2(QgsProcessingAlgorithm):
         feedback = QgsProcessingMultiStepFeedback(2, model_feedback)
         results = {}
         outputs = {}
-
+###################################################################
         # Warp (reproject)
+###################################################################
         alg_params = {
             'DATA_TYPE': 0,  # Use Input Layer Data Type
             'EXTRA': '',
-            'INPUT': '/Users/malenahedemann/Desktop/Clases herramientas/Clase 4/SUIT/suit/hdr.adf',
+            'INPUT': 'suit',
             'MULTITHREADING': False,
             'NODATA': None,
             'OPTIONS': '',
@@ -41,14 +42,14 @@ class Model2(QgsProcessingAlgorithm):
             'TARGET_RESOLUTION': None,
             'OUTPUT': parameters['Suitout']
         }
-        outputs['WarpReproject'] = processing.run('gdal:warpreproject', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        results['Suitout'] = outputs['WarpReproject']['OUTPUT']
+        Suitout = processing.run('gdal:warpreproject', alg_params, context=context, feedback=feedback, is_child_algorithm=True)['OUTPUT']
 
         feedback.setCurrentStep(1)
         if feedback.isCanceled():
             return {}
-
+###################################################################
         # Extract projection
+###################################################################
         alg_params = {
             'INPUT': outputs['WarpReproject']['OUTPUT'],
             'PRJ_FILE_CREATE': True
