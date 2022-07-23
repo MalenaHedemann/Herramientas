@@ -68,6 +68,7 @@ class Model4b(QgsProcessingAlgorithm):
 ['OUTPUT']
 
 ###################################################################
+        # Bajamos base coastline a carpeta INPUT
         # Fix geometries - coast
 ###################################################################
         alg_params = {
