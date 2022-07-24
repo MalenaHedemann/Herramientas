@@ -97,6 +97,7 @@ class Model4b(QgsProcessingAlgorithm):
 
 ###################################################################
         # Field calculator - cat adjust
+        # Corregimos la categoria cat para que empiece en cero
 ###################################################################
         alg_params = {
             'FIELD_LENGTH': 4,
@@ -112,6 +113,7 @@ class Model4b(QgsProcessingAlgorithm):
 
 ###################################################################
         # Join attributes by field value
+        # Hacemos join entre dos bases 
 ###################################################################
         alg_params = {
             'DISCARD_NONMATCHING': False,
@@ -332,6 +334,7 @@ class Model4b(QgsProcessingAlgorithm):
 
 ###################################################################
         # Field calculator - cent_lat
+        #Distancias a la cosrra, variables de latitud y longitud del centroide
 ###################################################################
         alg_params = {
             'FIELD_LENGTH': 10,
