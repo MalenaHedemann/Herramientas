@@ -37,6 +37,7 @@ class Modelo4c(QgsProcessingAlgorithm):
         outputs = {}
 ###################################################################
         # Drop field(s)
+        #Calculamos areas de paises
 ###################################################################
         alg_params = {
             'COLUMN': ['featurecla','scalerank','LABELRANK','SOVEREIGNT','SOV_A3','ADM0_DIF',

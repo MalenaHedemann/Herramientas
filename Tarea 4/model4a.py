@@ -34,6 +34,7 @@ class Model4a(QgsProcessingAlgorithm):
         outputs = {}
 ###################################################################
         # Fix geometries - wlds
+        # Nos queremos quedar con el GID de clean y con el ADMIN de counties
 ###################################################################
         alg_params = {
             'INPUT': 'clean',
@@ -43,6 +44,7 @@ class Model4a(QgsProcessingAlgorithm):
 
 ###################################################################
         # Fix geometries - countries
+        # Selecciona con distintos colores los distitnos idiomas en el mundo. Interseccion cuent apor cada pais cuantos aparecen en archivo de idiomas.
 ###################################################################
         alg_params = {
             'INPUT': 'admin',
@@ -52,6 +54,9 @@ class Model4a(QgsProcessingAlgorithm):
 
 ###################################################################
         # Statistics by categories
+        # Por admin en cada pais, ve cuantos idiomas hay en cada pais.
+        # Guardo como layer y luego como csv
+        # Cuantas veces esta en base de languages cada pais. Lo hace de forma geografica, no con merge de tablas. Lo expoerto como python
 ###################################################################
         alg_params = {
             'CATEGORIES_FIELD_NAME': ['ADMIN'],
