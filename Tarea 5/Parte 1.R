@@ -68,3 +68,21 @@ p3 <- p2+theme(axis.title.x=element_text(size=15),
                panel.grid.major.y = element_line( size=.1, color="grey" ) 
 )
 p3
+
+###GRAFICO 3
+### Exercise: Creating density plots
+df3s <- subset(df3,grade %in% c("A","B","C","D","E","F","G"))
+
+ggplot(df3s,aes(x=loan_amnt)) + geom_density() + facet_wrap(~grade) + 
+  labs(x="Loan Amount", y="Density") + theme_calc() 
+
+
+
+df3s <- subset(df3,grade %in% c("A","B","C","D","E","F","G"))
+
+ggplot(df3s,aes(x=loan_amnt)) + geom_density(data = df3s, colour = "black") + 
+  geom_density(aes(colour = grade))
+  facet_wrap(~grade) + labs(x="Loan Amount", y="Density") + theme_calc() 
+  
+  
+  
