@@ -1,5 +1,5 @@
 Prior to use, install the following packages:
-  install.packages("ggplot2")
+install.packages("ggplot2")
 install.packages("tibble")
 install.packages("dplyr")
 install.packages("gridExtra")
@@ -30,8 +30,6 @@ setwd("~/MAESTRIA/Herramientas/Clase 6/Applied-Data-Visualization-with-R-and-ggp
 #Check working directory
 getwd()
 
-#Note: Working directory should be "Beginning-Data-Visualization-with-ggplot2-and-R"
-
 #Load the data files
 df <- read.csv("data/gapminder-data.csv")
 df2 <- read.csv("data/xAPI-Edu-Data.csv")
@@ -55,5 +53,18 @@ p3
 
 ###GRAFICO 2
 
-
-
+dfn <- subset(HollywoodMovies2013, Genre %in% c("Action","Adventure","Comedy","Drama","Romance")
+              & LeadStudio %in% c("Fox","Sony","Columbia","Paramount","Disney"))
+p1 <- ggplot(dfn,aes(Genre,WorldGross)) 
+p1
+p2 <- p1+geom_bar(stat="Identity",aes(fill=LeadStudio),position="dodge")
+p2
+p3 <- p2+theme(axis.title.x=element_text(size=15),
+               axis.title.y=element_text(size=15),
+               plot.background=element_rect(fill="white"),
+               panel.background = element_rect(fill= "white"),
+               panel.grid.major.x = element_blank() ,
+               # explicitly set the horizontal lines (or they will disappear too)
+               panel.grid.major.y = element_line( size=.1, color="grey" ) 
+)
+p3
