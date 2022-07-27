@@ -42,6 +42,7 @@ str(df)
 str(df2)
 str(df3)
 
+###GRAFICO 1
 ##Grammar of graphics and visual components
 #Subtopic - Layers, color
 p1 <- ggplot(df,aes(x=Electricity_consumption_per_capita))
@@ -51,6 +52,8 @@ p2
 #Exercise-Layers and background theme
 p3 <- p2+xlab("Electricity consumption per capita")+ylab("Count")+  theme_calc()
 p3
-  
+
+###GRAFICO 2
+
 
 
