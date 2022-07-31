@@ -70,6 +70,8 @@ p3 <- p2+theme(axis.title.x=element_text(size=15),
 p3
 
 
+
+
 ###GRAFICO 3
 ### Exercise: Creating density plots
 df3s <- subset(df3,grade %in% c("A","B","C","D","E","F","G"))
@@ -83,6 +85,7 @@ df3s <- subset(df3,grade %in% c("A","B","C","D","E","F","G"))
 
 ggplot(df3s,aes(x=loan_amnt)) + geom_density(data = df3s, colour = "black") + 
   geom_density(aes(colour = grade))  +labs(y= "Density", x = "Loan Amount") 
+options(scipen=5)
 
   
   
