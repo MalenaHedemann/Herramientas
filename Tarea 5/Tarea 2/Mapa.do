@@ -1,0 +1,1 @@
+spmap crimecount using coord_ls, id(id) clmethod(q) cln(6) diagram(var(Pop) legenda(on) legtitle("") xcoord(x_c) ycoord(y_c) fcolor(Pink) size(1.5)) title("Número de crímenes") legend(size(medium) position(5) xoffset(15.05)) fcolor(Purples) plotregion(margin(b+15)) ndfcolor(black) name(g2,replace)  
